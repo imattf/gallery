@@ -19,3 +19,6 @@
 
 # my binary files
 lenslocked.com
+
+# fresh /tmp dir
+tmp/
