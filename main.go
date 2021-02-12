@@ -6,13 +6,20 @@ import (
 )
 
 func handlerFunc(w http.ResponseWriter, r *http.Request) {
-  // text/html is the default for browsers, but Jon likes to be explicit
-  // view Response Header in Web browser inspector (option+command+i)
-  // under Network tab
   w.Header().Set("Content-Type", "text/html")
   // w.Header().Set("Content-Type", "text/plain")
+
+  // logging to console on start-up
   fmt.Println("Somebody visited our page")
-  fmt.Fprint(w, "<h1>Welcome to the Awsome Sauce...</h1>")
+
+
+  if r.URL.Path == "/" {
+    fmt.Fprint(w, "<h1>Welcome to the Awsome Sauce...</h1>")
+  }else if r.URL.Path == "/contact" {
+    fmt.Fprint(w, "To get in touch, please send an email to <a href=\"mailto:support@lenslocked.com\">support@lenslocked.com</a>.")
+  } else {
+    fmt.Fprintf(w, r.URL.Path)
+  }
 }
 
 func main() {
