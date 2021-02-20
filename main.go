@@ -35,7 +35,7 @@ func homePage(w http.ResponseWriter, r *http.Request) {
   // print my path
   //fmt.Fprintf(w, r.URL.Path)
 
-  fmt.Fprint(w, "<h1>Welcome to the Awsome Sauce...</h1>")
+  fmt.Fprint(w, "<h1>Welcome to the Awesome Sauce...</h1>")
 
   // logging to console
   fmt.Println("home page")
@@ -53,9 +53,22 @@ func contactPage(w http.ResponseWriter, r *http.Request) {
   fmt.Println("contact page")
 }
 
+func faqPage(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set("Content-Type", "text/html")
+
+  // print my path
+  //fmt.Fprintf(w, r.URL.Path)
+
+  fmt.Fprint(w, "<h1>Some Awesome FAQs...</h1>")
+
+  // logging to console
+  fmt.Println("faq page")
+}
+
 func main() {
   r := mux.NewRouter()
   r.HandleFunc("/", homePage)
   r.HandleFunc("/contact", contactPage)
+  r.HandleFunc("/faq", faqPage)
   http.ListenAndServe(":3000", r)
 }
