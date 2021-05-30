@@ -2,19 +2,25 @@ package main
 
 import (
   "fmt"
+  "html/template"
   "net/http"
 
   "github.com/gorilla/mux"
 )
 
+var homeTemplate *template.Template
+
 
 func homePage(w http.ResponseWriter, r *http.Request) {
   w.Header().Set("Content-Type", "text/html")
+  if err :=homeTemplate.Execute(w, nil); err != nil{
+    panic(err)
+  }
 
   // print my path
   //fmt.Fprintf(w, r.URL.Path)
 
-  fmt.Fprint(w, "<h1>Welcome to the Awesome Sauce...</h1>")
+  // fmt.Fprint(w, "<h1>Welcome to the Awesome Sauce...</h1>")
 
   // logging to console
   fmt.Println("home page")
@@ -62,6 +68,11 @@ func notFoundPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+  var err error
+  homeTemplate, err = template.ParseFiles("views/home.gohtml")
+  if err != nil {
+    panic(err)
+  }
 
   // instance a gorilla mux
   r := mux.NewRouter()
