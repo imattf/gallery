@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/imattf/go-courses/lenslocked.com/views"
+	"gitlab.com/go-courses/lenslocked.com/views"
 	"net/http"
 )
 
 var (
 	homeView    *views.View
 	contactView *views.View
+	faqView     *views.View
 )
 
 func homePage(w http.ResponseWriter, r *http.Request) {
@@ -42,14 +43,16 @@ func contactPage(w http.ResponseWriter, r *http.Request) {
 
 func faqPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
+	err := faqView.Template.ExecuteTemplate(w, faqView.Layout, nil)
+	if err != nil {
+		panic(err)
+	}
 
+	//Debugging stuff...
 	// print my path
-	//fmt.Fprintf(w, r.URL.Path)
-
-	fmt.Fprint(w, "<h1>Some Awesome FAQs...</h1>")
-
+	// fmt.Fprintf(w, r.URL.Path)
 	// logging to console
-	fmt.Println("faq page")
+	// fmt.Println("faq page")
 }
 
 func notFoundPage(w http.ResponseWriter, r *http.Request) {
@@ -71,6 +74,7 @@ func main() {
 
 	homeView = views.NewView("bootstrap", "views/home.gohtml")
 	contactView = views.NewView("bootstrap", "views/contact.gohtml")
+	faqView = views.NewView("bootstrap", "views/faq.gohtml")
 
 	// var err error
 	// homeTemplate, err = template.ParseFiles(
