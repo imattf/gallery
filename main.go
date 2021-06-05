@@ -15,10 +15,7 @@ var (
 
 func homePage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	err := homeView.Template.ExecuteTemplate(w, homeView.Layout, nil)
-	if err != nil {
-		panic(err)
-	}
+  must(homeView.Render(w, nil))
 
 	//Debugging stuff...
 	// print my path
@@ -29,10 +26,7 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 
 func contactPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	err := contactView.Template.ExecuteTemplate(w, contactView.Layout, nil)
-	if err != nil {
-		panic(err)
-	}
+  must(contactView.Render(w, nil))
 
 	//Debugging stuff...
 	// print my path
@@ -43,10 +37,7 @@ func contactPage(w http.ResponseWriter, r *http.Request) {
 
 func faqPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	err := faqView.Template.ExecuteTemplate(w, faqView.Layout, nil)
-	if err != nil {
-		panic(err)
-	}
+  must(faqView.Render(w, nil))
 
 	//Debugging stuff...
 	// print my path
@@ -100,4 +91,10 @@ func main() {
 	r.HandleFunc("/contact", contactPage)
 	r.HandleFunc("/faq", faqPage)
 	http.ListenAndServe(":3000", r)
+}
+
+func must(err error){
+	if err != nil {
+		panic(err)
+	}
 }

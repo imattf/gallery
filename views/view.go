@@ -5,6 +5,7 @@ import (
 	//"fmt"
 	"html/template"
 	"path/filepath"
+	"net/http"
 )
 
 var (
@@ -15,6 +16,11 @@ var (
 type View struct {
 	Template *template.Template
 	Layout   string
+}
+
+// Render is used to render the View with a predefined layout
+func (v *View) Render(w http.ResponseWriter, data interface{}) error {
+	return v.Template.ExecuteTemplate(w, v.Layout, data)
 }
 
 func NewView(layout string, files ...string) *View {
@@ -37,9 +43,7 @@ func layoutFiles() []string {
 	if err != nil {
 		panic(err)
 	}
-
 	// logging to console
 	// fmt.Println(files)
-
 	return files
 }
