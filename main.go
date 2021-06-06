@@ -11,6 +11,7 @@ var (
 	homeView    *views.View
 	contactView *views.View
 	faqView     *views.View
+	signupView  *views.View
 )
 
 func homePage(w http.ResponseWriter, r *http.Request) {
@@ -27,23 +28,16 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 func contactPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
   must(contactView.Render(w, nil))
-
-	//Debugging stuff...
-	// print my path
-	// fmt.Fprintf(w, r.URL.Path)
-	// logging to console
-	// fmt.Println("contact page")
 }
 
 func faqPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
   must(faqView.Render(w, nil))
+}
 
-	//Debugging stuff...
-	// print my path
-	// fmt.Fprintf(w, r.URL.Path)
-	// logging to console
-	// fmt.Println("faq page")
+func signupPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+  must(signupView.Render(w, nil))
 }
 
 func notFoundPage(w http.ResponseWriter, r *http.Request) {
@@ -66,20 +60,7 @@ func main() {
 	homeView = views.NewView("bootstrap", "views/home.gohtml")
 	contactView = views.NewView("bootstrap", "views/contact.gohtml")
 	faqView = views.NewView("bootstrap", "views/faq.gohtml")
-
-	// var err error
-	// homeTemplate, err = template.ParseFiles(
-	//   "views/home.gohtml",
-	//   "views/layouts/footer.gohtml")
-	// if err != nil {
-	//   panic(err)
-	// }
-	// contactTemplate, err = template.ParseFiles(
-	//   "views/contact.gohtml",
-	//   "views/layouts/footer.gohtml")
-	// if err != nil {
-	//   panic(err)
-	// }
+	signupView = views.NewView("bootstrap", "views/signup.gohtml")
 
 	// instance a gorilla mux
 	r := mux.NewRouter()
@@ -90,6 +71,7 @@ func main() {
 	r.HandleFunc("/", homePage)
 	r.HandleFunc("/contact", contactPage)
 	r.HandleFunc("/faq", faqPage)
+	r.HandleFunc("/signup", signupPage)
 	http.ListenAndServe(":3000", r)
 }
 
