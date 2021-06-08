@@ -63,10 +63,11 @@ func main() {
 	// use custom 404 page
 	r.NotFoundHandler = http.HandlerFunc(notFoundPage)
 
-	r.HandleFunc("/", homePage)
-	r.HandleFunc("/contact", contactPage)
-	r.HandleFunc("/faq", faqPage)
-	r.HandleFunc("/signup", usersC.New)
+	r.HandleFunc("/", homePage).Methods("GET")
+	r.HandleFunc("/contact", contactPage).Methods("GET")
+	r.HandleFunc("/faq", faqPage).Methods("GET")
+	r.HandleFunc("/signup", usersC.New).Methods("GET")
+	r.HandleFunc("/signup", usersC.Create).Methods("POST")
 	http.ListenAndServe(":3000", r)
 }
 
