@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"gitlab.com/go-courses/lenslocked.com/views"
+	"gitlab.com/go-courses/lenslocked.com/controllers"
 	"net/http"
 )
 
@@ -11,7 +12,6 @@ var (
 	homeView    *views.View
 	contactView *views.View
 	faqView     *views.View
-	signupView  *views.View
 )
 
 func homePage(w http.ResponseWriter, r *http.Request) {
@@ -35,11 +35,6 @@ func faqPage(w http.ResponseWriter, r *http.Request) {
   must(faqView.Render(w, nil))
 }
 
-func signupPage(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-  must(signupView.Render(w, nil))
-}
-
 func notFoundPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
@@ -60,7 +55,7 @@ func main() {
 	homeView = views.NewView("bootstrap", "views/home.gohtml")
 	contactView = views.NewView("bootstrap", "views/contact.gohtml")
 	faqView = views.NewView("bootstrap", "views/faq.gohtml")
-	signupView = views.NewView("bootstrap", "views/signup.gohtml")
+	usersC := controllers.NewUsers()
 
 	// instance a gorilla mux
 	r := mux.NewRouter()
@@ -71,7 +66,7 @@ func main() {
 	r.HandleFunc("/", homePage)
 	r.HandleFunc("/contact", contactPage)
 	r.HandleFunc("/faq", faqPage)
-	r.HandleFunc("/signup", signupPage)
+	r.HandleFunc("/signup", usersC.New)
 	http.ListenAndServe(":3000", r)
 }
 
