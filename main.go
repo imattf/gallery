@@ -14,27 +14,6 @@ var (
 	faqView     *views.View
 )
 
-// func homePage(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "text/html")
-//   must(homeView.Render(w, nil))
-//
-// 	//Debugging stuff...
-// 	// print my path
-// 	// fmt.Fprintf(w, r.URL.Path)
-// 	// logging to console
-// 	// fmt.Println("home page")
-// }
-//
-// func contactPage(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "text/html")
-//   must(contactView.Render(w, nil))
-// }
-//
-// func faqPage(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "text/html")
-//   must(faqView.Render(w, nil))
-// }
-
 func notFoundPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
@@ -52,9 +31,6 @@ func notFoundPage(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	// homeView = views.NewView("bootstrap", "views/home.gohtml")
-	// contactView = views.NewView("bootstrap", "views/contact.gohtml")
-	// faqView = views.NewView("bootstrap", "views/faq.gohtml")
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUsers()
 
@@ -71,9 +47,3 @@ func main() {
 	r.HandleFunc("/signup", usersC.Create).Methods("POST")
 	http.ListenAndServe(":3000", r)
 }
-
-// func must(err error){
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
