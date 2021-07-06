@@ -53,14 +53,6 @@ func first(db *gorm.DB, destination interface{}) error {
 	if err == gorm.ErrRecordNotFound {
 	  return ErrNotFound
 	}
-	// switch err {
-	// case nil:
-	// 	return nil
-	// case gorm.ErrRecordNotFound:
-	// 	return ErrNotFound
-	// default:
-	// 	return err
-	// }
 	return err
 }
 
@@ -91,9 +83,20 @@ func (us *UserService) Close() error {
 }
 
 // DestructiveReset drops the user table and rebuilds it
-func (us *UserService) DestructiveReset() {
-	us.db.DropTableIfExists(&User{})
-	us.db.AutoMigrate(&User{})
+func (us *UserService) DestructiveReset() error {
+	if err := us.db.DropTableIfExists(&User{}).Error; err != nil {
+		return err
+	}
+	return us.AutoMigrate()
+}
+
+// Automigrate will attempt to automatically migrate the users table
+func (us *UserService) AutoMigrate() error {
+	if err := us.db.AutoMigrate(&User{}).Error; err != nil {
+		return err
+	}
+	return nil
+
 }
 
 type User struct {

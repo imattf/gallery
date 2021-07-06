@@ -5,7 +5,16 @@ import (
 	"github.com/gorilla/mux"
 	"gitlab.com/go-courses/lenslocked.com/views"
 	"gitlab.com/go-courses/lenslocked.com/controllers"
+	"gitlab.com/go-courses/lenslocked.com/models"
 	"net/http"
+)
+
+// temp for dev purposes
+const (
+	host   = "localhost"
+	port   = 5432
+	user   = "matthew"
+	dbname = "lenslocked_dev"
 )
 
 var (
@@ -31,8 +40,19 @@ func notFoundPage(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+// temp for dev purposes
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable",
+		host, port, user, dbname)
+	us, err := models.NewUserService(psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer us.Close()
+	//us.DestructiveReset()
+	us.AutoMigrate()
+
 	staticC := controllers.NewStatic()
-	usersC := controllers.NewUsers()
+	usersC := controllers.NewUsers(us)
 
 	// instance a gorilla mux
 	r := mux.NewRouter()
@@ -45,5 +65,7 @@ func main() {
 	r.Handle("/faq", staticC.Faq).Methods("GET")
 	r.HandleFunc("/signup", usersC.New).Methods("GET")
 	r.HandleFunc("/signup", usersC.Create).Methods("POST")
+
+	fmt.Println("Starting lenslocked on port :3000...")
 	http.ListenAndServe(":3000", r)
 }
