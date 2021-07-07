@@ -45,11 +45,39 @@ func (us *UserService) ByEmail(email string) (*User, error) {
 	return &user, err
 }
 
+// Lookup a user by Age in the database
+func (us *UserService) ByAge(age uint) (*User, error) {
+	var user User
+	db := us.db.Where("age = ?", age)
+	err := first(db, &user)
+	return &user, err
+}
+
+// Lookup a users by Age Range in the database
+func (us *UserService) InAgeRange(minAge, maxAge uint) ([]User, error) {
+	var users []User
+	db := us.db.Where("age BETWEEN ? and ?", minAge, maxAge)
+	err := find(db, &users)
+	return users, err
+}
+
+
 // first is a help function for Lookups and it will get the first item
 // returned and place into destination.
 // orig: func first(db *gorm.DB, user *User) error {
 func first(db *gorm.DB, destination interface{}) error {
 	err := db.First(destination).Error
+	if err == gorm.ErrRecordNotFound {
+	  return ErrNotFound
+	}
+	return err
+}
+
+// find is a help function for Lookups and it will get the first item
+// returned and place into destination.
+// orig: func first(db *gorm.DB, user *User) error {
+func find(db *gorm.DB, destination interface{}) error {
+	err := db.Find(destination).Error
 	if err == gorm.ErrRecordNotFound {
 	  return ErrNotFound
 	}
@@ -103,4 +131,5 @@ type User struct {
 	gorm.Model
 	Name  string
 	Email string `gorm:"not null;unique_index"`
+	Age   uint
 }
