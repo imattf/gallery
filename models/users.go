@@ -11,9 +11,16 @@ import (
 var (
 	// ErrNotFound is returned when a record cannot be found
 	ErrNotFound  = errors.New("models: resource not found")
+
 	// ErrInvalidID is returned when an ID is 0, for example
 	ErrInvalidID = errors.New("models: ID provided was invalid")
+<<<<<<< HEAD
 	// ErrInvalidPassword is returned when a password does not match email
+=======
+
+	// ErrInvalidPassword is returned when an invalid password is used
+	// when authenticating a user
+>>>>>>> a9d8bcac94a9b0eb9b07b95c71d5e3aac00ee0a1
 	ErrInvalidPassword = errors.New("models: incorrect password provided")
 )
 
@@ -95,6 +102,7 @@ func (us *UserService) Create(user *User) error {
 	return us.db.Create(user).Error
 }
 
+<<<<<<< HEAD
 // Authenticate is used to authenticate a users
 // with an email and Password
 // If the mail provided in invalid, return nil and ErrRecordNotFound
@@ -103,10 +111,25 @@ func (us *UserService) Create(user *User) error {
 // Otherwise... another error has occurred and return nil and the error
 func (us *UserService) Authenticate(email, password string) (*User, error) {
 	foundUser, err := us.ByEmail(email)
+=======
+// Athenticates a user loging request
+// takes an email and Password
+// If the email doesn't exist
+//   return nil and ErrNotFound
+// If the password provided doesn't match the hased password
+//   return nil and an ErrInvalidPassword
+// If the email and password are both valid
+//   return the user and nil
+// Otherwise another system error was encountered
+//   return nil and the error
+func (us *UserService) Authenticate(email, password string) (*User, error) {
+	foundUser, err := us.ByEail(email)
+>>>>>>> a9d8bcac94a9b0eb9b07b95c71d5e3aac00ee0a1
 	if err != nil {
 		return nil, err
 	}
 
+<<<<<<< HEAD
 	err =bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password + userPwPepper))
 	if err != nil {
 		switch err {
@@ -117,6 +140,18 @@ func (us *UserService) Authenticate(email, password string) (*User, error) {
 		}
 	}
 	 return foundUser, nil
+=======
+	err := bcrypt.ComapreHashAndPassword([]byte(foundUser.PasswordHash), []byte(password + userPwPepper))
+  if err != nil {
+		switch err {
+	  case bcrypt.ErrMismatchedHashAndPassword:
+		  return nil, ErrInvalidPassword
+		default:
+			return nil, err
+		}
+
+		return foundUser, nil
+>>>>>>> a9d8bcac94a9b0eb9b07b95c71d5e3aac00ee0a1
 }
 
 // Update a user in the database
