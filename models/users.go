@@ -13,6 +13,8 @@ var (
 	ErrNotFound  = errors.New("models: resource not found")
 	// ErrInvalidID is returned when an ID is 0, for example
 	ErrInvalidID = errors.New("models: ID provided was invalid")
+	// ErrInvalidPassword is returned when a password does not match email
+	ErrInvalidPassword = errors.New("models: incorrect password provided")
 )
 
 const userPwPepper = "some-secret"
@@ -44,14 +46,6 @@ func (us *UserService) ByID(id uint) (*User, error) {
 func (us *UserService) ByEmail(email string) (*User, error) {
 	var user User
 	db := us.db.Where("email = ?", email)
-	err := first(db, &user)
-	return &user, err
-}
-
-// Lookup a user by Age in the database
-func (us *UserService) ByAge(age uint) (*User, error) {
-	var user User
-	db := us.db.Where("age = ?", age)
 	err := first(db, &user)
 	return &user, err
 }
@@ -99,6 +93,30 @@ func (us *UserService) Create(user *User) error {
 	user.Password = ""
 	// return nil   // use for unit test
 	return us.db.Create(user).Error
+}
+
+// Authenticate is used to authenticate a users
+// with an email and Password
+// If the mail provided in invalid, return nil and ErrRecordNotFound
+// If password is invalid, return nil and ErrInvalidPassword
+// If the email and password are valid, return user and no error
+// Otherwise... another error has occurred and return nil and the error
+func (us *UserService) Authenticate(email, password string) (*User, error) {
+	foundUser, err := us.ByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+
+	err =bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password + userPwPepper))
+	if err != nil {
+		switch err {
+		case bcrypt.ErrMismatchedHashAndPassword:
+			return nil, ErrInvalidPassword
+		default:
+			return nil, err
+		}
+	}
+	 return foundUser, nil
 }
 
 // Update a user in the database
