@@ -11,8 +11,13 @@ import (
 var (
 	// ErrNotFound is returned when a record cannot be found
 	ErrNotFound  = errors.New("models: resource not found")
+
 	// ErrInvalidID is returned when an ID is 0, for example
 	ErrInvalidID = errors.New("models: ID provided was invalid")
+
+	// ErrInvalidPassword is returned when an invalid password is used
+	// when authenticating a user
+	ErrInvalidPassword = errors.New("models: incorrect password provided")
 )
 
 const userPwPepper = "some-secret"
@@ -99,6 +104,34 @@ func (us *UserService) Create(user *User) error {
 	user.Password = ""
 	// return nil   // use for unit test
 	return us.db.Create(user).Error
+}
+
+// Athenticates a user loging request
+// takes an email and Password
+// If the email doesn't exist
+//   return nil and ErrNotFound
+// If the password provided doesn't match the hased password
+//   return nil and an ErrInvalidPassword
+// If the email and password are both valid
+//   return the user and nil
+// Otherwise another system error was encountered
+//   return nil and the error
+func (us *UserService) Authenticate(email, password string) (*User, error) {
+	foundUser, err := us.ByEail(email)
+	if err != nil {
+		return nil, err
+	}
+
+	err := bcrypt.ComapreHashAndPassword([]byte(foundUser.PasswordHash), []byte(password + userPwPepper))
+  if err != nil {
+		switch err {
+	  case bcrypt.ErrMismatchedHashAndPassword:
+		  return nil, ErrInvalidPassword
+		default:
+			return nil, err
+		}
+
+		return foundUser, nil
 }
 
 // Update a user in the database
