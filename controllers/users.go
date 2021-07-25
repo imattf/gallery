@@ -61,8 +61,10 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
     http.Error(w, err.Error(), http.StatusInternalServerError)
     return
   }
-  fmt.Fprintln(w, form)
-  fmt.Fprintln(w, user)
+  signIn(w, &user)
+  http.Redirect(w, r, "/cookie", http.StatusFound)
+  // fmt.Fprintln(w, form)
+  // fmt.Fprintln(w, user)
 
 }
 
@@ -89,12 +91,18 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
     return
   }
 
+  signIn(w, user)
+  http.Redirect(w, r, "/cookie", http.StatusFound)
+  //fmt.Fprintln(w, user)
+}
+
+// Assign session cookie
+func signIn(w http.ResponseWriter, user *models.User) {
   cookie := http.Cookie{
     Name: "email",
     Value: user.Email,
   }
   http.SetCookie(w, &cookie)
-  fmt.Fprintln(w, user)
 }
 
 // Read email cookie for testing
