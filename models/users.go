@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"gitlab.com/go-courses/lenslocked.com/hash"
+	"gitlab.com/go-courses/lenslocked.com/rand"
 )
 
 var (
