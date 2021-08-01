@@ -92,6 +92,9 @@ func NewUserService(connectionInfo string) (UserService, error) {
 	}, nil
 }
 
+// Compiler check to make sure userService implements UserService
+var _ UserService = &userService{}
+
 type userService struct {
   UserDB
 }
@@ -133,7 +136,6 @@ type userValidator struct {
 	UserDB
 }
 
-
 func newUserGorm(connectionInfo string) (*userGorm, error) {
 	db, err := gorm.Open("postgres", connectionInfo)
 	if err != nil {
@@ -147,13 +149,13 @@ func newUserGorm(connectionInfo string) (*userGorm, error) {
 	}, nil
 }
 
+// Compiler check that type matches interface
+var _ UserDB = &userGorm{}
+
 type userGorm struct {
 	db   *gorm.DB
 	hmac hash.HMAC
 }
-
-// Compiler check that type matches interface
-var _ UserDB = &userGorm{}
 
 // ByID method allows us to find a user
 func (ug *userGorm) ByID(id uint) (*User, error) {
