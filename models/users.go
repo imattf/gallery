@@ -17,12 +17,12 @@ var (
 	// ErrNotFound is returned when a record cannot be found
 	ErrNotFound  = errors.New("models: resource not found")
 
-	// ErrInvalidID is returned when an ID is 0, for example
-	ErrInvalidID = errors.New("models: ID provided was invalid")
+	// ErrIDInvalid is returned when an ID is 0, for example
+	ErrIDInvalid = errors.New("models: ID provided was invalid")
 
-	// ErrInvalidPassword is returned when an invalid password is used
+	// ErrPasswordIncorrect is returned when an invalid password is used
 	// when authenticating a user
-	ErrInvalidPassword = errors.New("models: incorrect password provided")
+	ErrPasswordIncorrect = errors.New("models: incorrect password provided")
 
 	// ErrEmailRequired is returned when an email address is not provided
 	// when creating a user
@@ -38,6 +38,13 @@ var (
 	// ErrEmailTaken is used to verify if an email is already in use during an update
 	// or create of a user
 	ErrEmailTaken = errors.New("models: Email address is already taken")
+
+	// ErrPasswordRequired is return when creating a user and no password
+	// is provided
+	ErrPasswordRequired = errors.New("models: Password is required")
+
+	// ErrPasswordTooShort is used to insure password has minimum length
+	ErrPasswordTooShort = errors.New("models: Password is too short")
 )
 
 const userPwPepper = "some-secret"
@@ -92,7 +99,7 @@ type UserService interface {
 	// Authenticate will verify the provided email address and password
 	// are correct. Tf they are coreect, the corresponding user will be
 	// returned. Otherwiseyou will recieve either:
-	// ErrNotFound, ErrInvalidPassword or another error if something goes wrong.
+	// ErrNotFound, ErrPasswordIncorrect or another error if something goes wrong.
 	Authenticate(email, password string) (*User, error)
 	UserDB
 }
@@ -121,7 +128,7 @@ type userService struct {
 // If the email doesn't exist
 //   return nil and ErrNotFound
 // If the password provided doesn't match the hased password
-//   return nil and an ErrInvalidPassword
+//   return nil and an ErrPasswordIncorrect
 // If the email and password are both valid
 //   return the user and nil
 // Otherwise another system error was encountered
@@ -136,7 +143,7 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 	if err != nil {
 		switch err {
 		case bcrypt.ErrMismatchedHashAndPassword:
-			return nil, ErrInvalidPassword
+			return nil, ErrPasswordIncorrect
 		default:
 			return nil, err
 		}
@@ -191,7 +198,10 @@ func (uv *userValidator) ByRemember(token string) (*User, error) {
 // related meta-data like ID, CreatedAt...
 func (uv *userValidator) Create(user *User) error {
   err := runUserValFuncs(user,
+    uv.passwordRequired,
+		uv.passwordMinLength,
 		uv.bcryptPassword,
+		uv.passwordHashRequired,
 		uv.setRememberIfUnset,
 		uv.hmacRemember,
 	  uv.normalizeEmail,
@@ -255,7 +265,7 @@ func (uv *userValidator) setRememberIfUnset(user *User) error {
 func (uv *userValidator) idGreaterThan(n uint) userValFunc {
 	return userValFunc(func(user *User) error{
 		if user.ID <= n {
-			return ErrInvalidID
+			return ErrIDInvalid
 		}
 		return nil
 	})
@@ -266,7 +276,9 @@ func (uv *userValidator) idGreaterThan(n uint) userValFunc {
 // Update will hash a remember token if it is provided.
 func (uv *userValidator) Update(user *User) error {
 	err := runUserValFuncs(user,
+    uv.passwordMinLength,
 		uv.bcryptPassword,
+		uv.passwordHashRequired,
 		uv.hmacRemember,
 	  uv.normalizeEmail,
 	  uv.requireEmail,
@@ -326,6 +338,33 @@ func (uv *userValidator) emailIsAvail(user *User) error {
 	}
 	return nil
 }
+
+func (uv *userValidator) passwordMinLength(user *User) error {
+	if user.Password == "" {
+		return nil
+	}
+	if len(user.Password) < 8 {
+		return ErrPasswordTooShort
+	}
+	return nil
+}
+
+func (uv *userValidator) passwordRequired(user *User) error {
+	if user.Password == "" {
+		return ErrPasswordRequired
+	}
+	return nil
+}
+
+func (uv *userValidator) passwordHashRequired(user *User) error {
+	if user.PasswordHash == "" {
+		return ErrPasswordRequired
+	}
+	return nil
+}
+
+
+
 
 func newUserGorm(connectionInfo string) (*userGorm, error) {
 	db, err := gorm.Open("postgres", connectionInfo)
@@ -418,7 +457,7 @@ func (ug *userGorm) Update(user *User) error {
 // Delete a user in the database
 func (ug *userGorm) Delete(id uint) error {
 	// if id == 0 {
-	// 	return ErrInvalidID
+	// 	return ErrIDInvalid
 	// }
 	user := User{Model: gorm.Model{ID: id}}
 	return ug.db.Delete(&user).Error
