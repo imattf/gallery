@@ -45,6 +45,13 @@ var (
 
 	// ErrPasswordTooShort is used to insure password has minimum length
 	ErrPasswordTooShort = errors.New("models: Password is too short")
+
+	// ErrRememberTooShort is used to insure remember token is at least 32 bytes
+	ErrRememberTooShort = errors.New("models: Remember token must be 32 bytes.")
+
+	// ErrRememberHash is returned when a create or update
+	// is attempted without a valid user remember token hash.
+	ErrRememberRequired = errors.New("models: Remember hash is reuired.")
 )
 
 const userPwPepper = "some-secret"
@@ -203,7 +210,9 @@ func (uv *userValidator) Create(user *User) error {
 		uv.bcryptPassword,
 		uv.passwordHashRequired,
 		uv.setRememberIfUnset,
+		uv.rememberMinBytes,
 		uv.hmacRemember,
+		uv.rememberHashRequired,
 	  uv.normalizeEmail,
 	  uv.requireEmail,
 	  uv.emailFormat,
@@ -279,7 +288,9 @@ func (uv *userValidator) Update(user *User) error {
     uv.passwordMinLength,
 		uv.bcryptPassword,
 		uv.passwordHashRequired,
+		uv.rememberMinBytes,
 		uv.hmacRemember,
+		uv.rememberHashRequired,
 	  uv.normalizeEmail,
 	  uv.requireEmail,
 	  uv.emailFormat,
@@ -363,8 +374,26 @@ func (uv *userValidator) passwordHashRequired(user *User) error {
 	return nil
 }
 
+func (uv *userValidator) rememberMinBytes(user *User) error {
+	if user.Remember == "" {
+		return nil
+	}
+	n, err := rand.NBytes(user.Remember)
+	if err != nil {
+		return err
+	}
+	if n < 32 {
+		return ErrRememberTooShort
+	}
+	return nil
+}
 
-
+func (uv *userValidator) rememberHashRequired(user *User) error {
+	if user.RememberHash == "" {
+		return ErrRememberRequired
+	}
+	return nil
+}
 
 func newUserGorm(connectionInfo string) (*userGorm, error) {
 	db, err := gorm.Open("postgres", connectionInfo)
