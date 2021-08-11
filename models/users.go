@@ -159,6 +159,17 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 
 }
 
+type userValFunc func(*User) error
+
+func runUserValFuncs(user *User, fns ...userValFunc) error {
+	for _, fn := range fns {
+		if err := fn(user); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 
 // Compiler check to make sure userValidator implements UserDB
 var _ UserDB = &userValidator{}
@@ -223,15 +234,34 @@ func (uv *userValidator) Create(user *User) error {
 	return uv.UserDB.Create(user)
 }
 
-type userValFunc func(*User) error
-
-func runUserValFuncs(user *User, fns ...userValFunc) error {
-	for _, fn := range fns {
-		if err := fn(user); err != nil {
-			return err
-		}
+// Update will hash a remember token if it is provided.
+func (uv *userValidator) Update(user *User) error {
+	err := runUserValFuncs(user,
+    uv.passwordMinLength,
+		uv.bcryptPassword,
+		uv.passwordHashRequired,
+		uv.rememberMinBytes,
+		uv.hmacRemember,
+		uv.rememberHashRequired,
+	  uv.normalizeEmail,
+	  uv.requireEmail,
+	  uv.emailFormat,
+	  uv.emailIsAvail)
+	if err != nil {
+		return err
 	}
-	return nil
+	return uv.UserDB.Update(user)
+}
+
+// Delete a user in the database
+func (uv *userValidator) Delete(id uint) error {
+  var user User
+	user.ID = id
+	err := runUserValFuncs(&user, uv.idGreaterThan(0))
+	if err != nil {
+		return err
+	}
+	return uv.UserDB.Delete(id)
 }
 
 // bcryptPassword will hash a user's password with a predefinded pepper
@@ -271,6 +301,27 @@ func (uv *userValidator) setRememberIfUnset(user *User) error {
 	return nil
 }
 
+func (uv *userValidator) rememberMinBytes(user *User) error {
+	if user.Remember == "" {
+		return nil
+	}
+	n, err := rand.NBytes(user.Remember)
+	if err != nil {
+		return err
+	}
+	if n < 32 {
+		return ErrRememberTooShort
+	}
+	return nil
+}
+
+func (uv *userValidator) rememberHashRequired(user *User) error {
+	if user.RememberHash == "" {
+		return ErrRememberRequired
+	}
+	return nil
+}
+
 func (uv *userValidator) idGreaterThan(n uint) userValFunc {
 	return userValFunc(func(user *User) error{
 		if user.ID <= n {
@@ -278,38 +329,6 @@ func (uv *userValidator) idGreaterThan(n uint) userValFunc {
 		}
 		return nil
 	})
-}
-
-
-
-// Update will hash a remember token if it is provided.
-func (uv *userValidator) Update(user *User) error {
-	err := runUserValFuncs(user,
-    uv.passwordMinLength,
-		uv.bcryptPassword,
-		uv.passwordHashRequired,
-		uv.rememberMinBytes,
-		uv.hmacRemember,
-		uv.rememberHashRequired,
-	  uv.normalizeEmail,
-	  uv.requireEmail,
-	  uv.emailFormat,
-	  uv.emailIsAvail)
-	if err != nil {
-		return err
-	}
-	return uv.UserDB.Update(user)
-}
-
-// Delete a user in the database
-func (uv *userValidator) Delete(id uint) error {
-  var user User
-	user.ID = id
-	err := runUserValFuncs(&user, uv.idGreaterThan(0))
-	if err != nil {
-		return err
-	}
-	return uv.UserDB.Delete(id)
 }
 
 func (uv *userValidator) normalizeEmail(user *User) error {
@@ -374,26 +393,8 @@ func (uv *userValidator) passwordHashRequired(user *User) error {
 	return nil
 }
 
-func (uv *userValidator) rememberMinBytes(user *User) error {
-	if user.Remember == "" {
-		return nil
-	}
-	n, err := rand.NBytes(user.Remember)
-	if err != nil {
-		return err
-	}
-	if n < 32 {
-		return ErrRememberTooShort
-	}
-	return nil
-}
-
-func (uv *userValidator) rememberHashRequired(user *User) error {
-	if user.RememberHash == "" {
-		return ErrRememberRequired
-	}
-	return nil
-}
+// Compiler check that type matches interface
+var _ UserDB = &userGorm{}
 
 func newUserGorm(connectionInfo string) (*userGorm, error) {
 	db, err := gorm.Open("postgres", connectionInfo)
@@ -407,9 +408,6 @@ func newUserGorm(connectionInfo string) (*userGorm, error) {
 		// hmac: hmac,
 	}, nil
 }
-
-// Compiler check that type matches interface
-var _ UserDB = &userGorm{}
 
 type userGorm struct {
 	db   *gorm.DB
