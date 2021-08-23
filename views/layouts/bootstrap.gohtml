@@ -15,9 +15,11 @@
     <div class="container-fluid">
       
       <!-- Our content will go here... somehow -->
-      {{template "alert" .}}
-
-      {{template "yield" .}}
+      {{if .Alert}}
+        {{template "alert" .Alert}}
+      {{end}}
+      
+      {{template "yield" .Yield}}
 
       {{template "footer"}}
 
