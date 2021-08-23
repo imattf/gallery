@@ -5,6 +5,9 @@ const (
 	AlterLevelWarning = "warning"
 	AlterLevelInfo    = "info"
 	AlterLevelSuccess = "success"
+
+	// AlterMsgGeneric is displayed for random unexpected error
+	AlertMsgGeneric = "Something went wrong... Please try again and contact us if the problem persists."
 )
 
 // Alter is used to render a Bootstrap Alert message
