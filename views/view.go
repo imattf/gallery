@@ -4,8 +4,8 @@ package views
 import (
 	//"fmt"
 	"html/template"
-	"path/filepath"
 	"net/http"
+	"path/filepath"
 )
 
 var (
@@ -22,6 +22,14 @@ type View struct {
 // Render is used to render the View with a predefined layout
 func (v *View) Render(w http.ResponseWriter, data interface{}) error {
 	w.Header().Set("Content-Type", "text/html")
+	switch data.(type) {
+	case Data:
+		//do nothing
+	default:
+		data = Data{
+			Yield: data,
+		}
+	}
 	return v.Template.ExecuteTemplate(w, v.Layout, data)
 }
 
@@ -39,7 +47,7 @@ func (v *View) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // e.g. the input {"home"} would result in the output
 // {"views/home"} if TemplateDir == "views/"
 func addTemplatePath(files []string) {
-	for i,f := range files {
+	for i, f := range files {
 		files[i] = TemplateDir + f
 	}
 }
@@ -51,11 +59,10 @@ func addTemplatePath(files []string) {
 // e.g. the input {"home"} would result in the output
 // {"home.gohtml"} if TemplateExt == ".gohtml"
 func addTemplateExt(files []string) {
-	for i,f := range files {
+	for i, f := range files {
 		files[i] = f + TemplateExt
 	}
 }
-
 
 func NewView(layout string, files ...string) *View {
 	addTemplatePath(files)
