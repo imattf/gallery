@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gorilla/mux"
-	"gitlab.com/go-courses/lenslocked.com/views"
 	"gitlab.com/go-courses/lenslocked.com/controllers"
 	"gitlab.com/go-courses/lenslocked.com/models"
-	"net/http"
+	"gitlab.com/go-courses/lenslocked.com/views"
 )
 
 // temp for dev purposes
@@ -40,7 +41,7 @@ func notFoundPage(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-// temp for dev purposes
+	// temp for dev purposes
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable",
 		host, port, user, dbname)
 	us, err := models.NewUserService(psqlInfo)
