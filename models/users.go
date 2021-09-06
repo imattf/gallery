@@ -68,16 +68,13 @@ type UserService interface {
 	UserDB
 }
 
-func NewUserService(connectionInfo string) (UserService, error) {
-	ug, err := newUserGorm(connectionInfo)
-	if err != nil {
-		return nil, err
-	}
+func NewUserService(db *gorm.DB) UserService {
+	ug := &userGorm{db}
 	hmac := hash.NewHMAC(hmacSecretKey)
 	uv := newUserValidator(ug, hmac)
 	return &userService{
 		UserDB: uv,
-	}, nil
+	}
 }
 
 // Compiler check to make sure userService implements UserService
@@ -352,18 +349,18 @@ func (uv *userValidator) passwordHashRequired(user *User) error {
 // Compiler check that type matches interface
 var _ UserDB = &userGorm{}
 
-func newUserGorm(connectionInfo string) (*userGorm, error) {
-	db, err := gorm.Open("postgres", connectionInfo)
-	if err != nil {
-		return nil, err
-	}
-	db.LogMode(true)
-	// hmac := hash.NewHMAC(hmacSecretKey)
-	return &userGorm{
-		db: db,
-		// hmac: hmac,
-	}, nil
-}
+// func newUserGorm(connectionInfo string) (*userGorm, error) {
+// 	db, err := gorm.Open("postgres", connectionInfo)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	db.LogMode(true)
+// 	// hmac := hash.NewHMAC(hmacSecretKey)
+// 	return &userGorm{
+// 		db: db,
+// 		// hmac: hmac,
+// 	}, nil
+// }
 
 type userGorm struct {
 	db *gorm.DB

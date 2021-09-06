@@ -44,16 +44,17 @@ func main() {
 	// temp for dev purposes
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable",
 		host, port, user, dbname)
-	us, err := models.NewUserService(psqlInfo)
+	services, err := models.NewServices(psqlInfo)
 	if err != nil {
 		panic(err)
 	}
-	defer us.Close()
-	us.DestructiveReset()
+	// TODO: fix this....
+	// defer us.Close()
+	// us.DestructiveReset()
 	// us.AutoMigrate()
 
 	staticC := controllers.NewStatic()
-	usersC := controllers.NewUsers(us)
+	usersC := controllers.NewUsers(services.User)
 
 	// instance a gorilla mux
 	r := mux.NewRouter()
