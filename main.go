@@ -48,10 +48,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	// TODO: fix this....
-	// defer us.Close()
-	// us.DestructiveReset()
-	// us.AutoMigrate()
+
+	defer services.Close()
+	services.DestructiveReset()
+	services.AutoMigrate()
 
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUsers(services.User)
