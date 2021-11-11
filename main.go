@@ -74,6 +74,7 @@ func main() {
 
 	// Gallery routes
 	r.Handle("/galleries/new", galleriesC.New).Methods("GET")
+	r.HandleFunc("/galleriesgoo", galleriesC.Create).Methods("POST")
 
 	fmt.Println("Starting lenslocked on port :3000...")
 	http.ListenAndServe(":3000", r)
