@@ -6,9 +6,9 @@ import (
 
 	"github.com/gorilla/mux"
 	"gitlab.com/go-courses/lenslocked.com/controllers"
+	"gitlab.com/go-courses/lenslocked.com/middleware"
 	"gitlab.com/go-courses/lenslocked.com/models"
 	"gitlab.com/go-courses/lenslocked.com/views"
-	"gitlab.com/go-courses/lenslocked.com/middleware"
 )
 
 // temp for dev purposes
@@ -57,7 +57,7 @@ func main() {
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUsers(services.User)
 	galleriesC := controllers.NewGalleries(services.Gallery)
-	
+
 	requireUserMw := middleware.RequireUser{
 		UserService: services.User,
 	}
