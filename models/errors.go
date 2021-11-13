@@ -6,9 +6,6 @@ const (
 	// ErrNotFound is returned when a record cannot be found
 	ErrNotFound modelError = "models: resource not found"
 
-	// ErrIDInvalid is returned when an ID is 0, for example
-	ErrIDInvalid privateError = "models: ID provided was invalid"
-
 	// ErrPasswordIncorrect is returned when an invalid password is used
 	// when authenticating a user
 	ErrPasswordIncorrect modelError = "models: incorrect password provided"
@@ -35,6 +32,12 @@ const (
 	// ErrPasswordTooShort is used to insure password has minimum length
 	ErrPasswordTooShort modelError = "models: Password must be at least 8 characters long"
 
+	// ErrTitleRequired is used to insure valid title is supplied for gallery
+	ErrTitleRequired modelError = "models: title is required"
+
+	// ErrIDInvalid is returned when an ID is 0, for example
+	ErrIDInvalid privateError = "models: ID provided was invalid"
+
 	// ErrRememberTooShort is used to insure remember token is at least 32 bytes
 	ErrRememberTooShort privateError = "models: Remember token must be 32 bytes"
 
@@ -42,9 +45,8 @@ const (
 	// is attempted without a valid user remember token hash.
 	ErrRememberRequired privateError = "models: Remember hash is required"
 
+	// ErrUserIDRequired is used to insure valid userID is connected to gallery
 	ErrUserIDRequired privateError = "models: userID is required"
-
-	ErrTitleRequired modelError = "models: title is required"
 )
 
 type modelError string

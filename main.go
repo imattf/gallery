@@ -8,6 +8,7 @@ import (
 	"gitlab.com/go-courses/lenslocked.com/controllers"
 	"gitlab.com/go-courses/lenslocked.com/models"
 	"gitlab.com/go-courses/lenslocked.com/views"
+	"gitlab.com/go-courses/lenslocked.com/middleware"
 )
 
 // temp for dev purposes
@@ -56,6 +57,10 @@ func main() {
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUsers(services.User)
 	galleriesC := controllers.NewGalleries(services.Gallery)
+	
+	requireUserMw := middleware.RequireUser{
+		UserService: services.User,
+	}
 
 	// instance a gorilla mux
 	r := mux.NewRouter()
@@ -73,8 +78,8 @@ func main() {
 	r.HandleFunc("/cookie", usersC.CookieTest).Methods("GET")
 
 	// Gallery routes
-	r.Handle("/galleries/new", galleriesC.New).Methods("GET")
-	r.HandleFunc("/galleriesgoo", galleriesC.Create).Methods("POST")
+	r.Handle("/galleries/new", requireUserMw.Apply(galleriesC.New)).Methods("GET")
+	r.HandleFunc("/galleries", requireUserMw.ApplyFn(galleriesC.Create)).Methods("POST")
 
 	fmt.Println("Starting lenslocked on port :3000...")
 	http.ListenAndServe(":3000", r)
