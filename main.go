@@ -51,19 +51,19 @@ func main() {
 	}
 
 	defer services.Close()
-	services.DestructiveReset()
+	// services.DestructiveReset()
 	services.AutoMigrate()
+
+	// instance a gorilla mux
+	r := mux.NewRouter()
 
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUsers(services.User)
-	galleriesC := controllers.NewGalleries(services.Gallery)
+	galleriesC := controllers.NewGalleries(services.Gallery, r)
 
 	requireUserMw := middleware.RequireUser{
 		UserService: services.User,
 	}
-
-	// instance a gorilla mux
-	r := mux.NewRouter()
 
 	// use custom 404 page
 	r.NotFoundHandler = http.HandlerFunc(notFoundPage)
@@ -80,6 +80,7 @@ func main() {
 	// Gallery routes
 	r.Handle("/galleries/new", requireUserMw.Apply(galleriesC.New)).Methods("GET")
 	r.HandleFunc("/galleries", requireUserMw.ApplyFn(galleriesC.Create)).Methods("POST")
+	r.HandleFunc("/galleries/{id:[0-9]+}", galleriesC.Show).Methods("GET").Name(controllers.ShowGallery)
 
 	fmt.Println("Starting lenslocked on port :3000...")
 	http.ListenAndServe(":3000", r)
