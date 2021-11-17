@@ -2,9 +2,9 @@ package views
 
 const (
 	AlertLevelError   = "danger"
-	AlterLevelWarning = "warning"
-	AlterLevelInfo    = "info"
-	AlterLevelSuccess = "success"
+	AlertLevelWarning = "warning"
+	AlertLevelInfo    = "info"
+	AlertLevelSuccess = "success"
 
 	// AlterMsgGeneric is displayed for random unexpected error
 	AlertMsgGeneric = "Something went wrong... Please try again and contact us if the problem persists."
