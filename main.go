@@ -8,7 +8,6 @@ import (
 	"gitlab.com/go-courses/lenslocked.com/controllers"
 	"gitlab.com/go-courses/lenslocked.com/middleware"
 	"gitlab.com/go-courses/lenslocked.com/models"
-	"gitlab.com/go-courses/lenslocked.com/views"
 )
 
 // temp for dev purposes
@@ -19,11 +18,11 @@ const (
 	dbname = "lenslocked_dev"
 )
 
-var (
-	homeView    *views.View
-	contactView *views.View
-	faqView     *views.View
-)
+// var (
+// 	homeView    *views.View
+// 	contactView *views.View
+// 	faqView     *views.View
+// )
 
 func notFoundPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -46,10 +45,7 @@ func main() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable",
 		host, port, user, dbname)
 	services, err := models.NewServices(psqlInfo)
-	if err != nil {
-		fmt.Println("Did you start the database?")
-		panic(err)
-	}
+	must(err)
 
 	defer services.Close()
 	// services.DestructiveReset()
@@ -62,8 +58,11 @@ func main() {
 	usersC := controllers.NewUsers(services.User)
 	galleriesC := controllers.NewGalleries(services.Gallery, r)
 
-	requireUserMw := middleware.RequireUser{
+	userMw := middleware.User{
 		UserService: services.User,
+	}
+	requireUserMw := middleware.RequireUser{
+		User: userMw,
 	}
 
 	// use custom 404 page
@@ -76,7 +75,7 @@ func main() {
 	r.HandleFunc("/signup", usersC.Create).Methods("POST")
 	r.Handle("/login", usersC.LoginView).Methods("GET")
 	r.HandleFunc("/login", usersC.Login).Methods("POST")
-	r.HandleFunc("/cookie", usersC.CookieTest).Methods("GET")
+	// r.HandleFunc("/cookie", usersC.CookieTest).Methods("GET")
 
 	// Gallery routes
 	r.Handle("/galleries", requireUserMw.ApplyFn(galleriesC.Index)).Methods("GET")
@@ -88,5 +87,12 @@ func main() {
 	r.HandleFunc("/galleries/{id:[0-9]+}", galleriesC.Show).Methods("GET").Name(controllers.ShowGallery)
 
 	fmt.Println("Starting lenslocked on port :3000...")
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe(":3000", userMw.Apply(r))
+}
+
+func must(err error) {
+	if err != nil {
+		fmt.Println("Did you start the database?")
+		panic(err)
+	}
 }

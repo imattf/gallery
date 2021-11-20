@@ -1,5 +1,7 @@
 package views
 
+import "gitlab.com/go-courses/lenslocked.com/models"
+
 const (
 	AlertLevelError   = "danger"
 	AlertLevelWarning = "warning"
@@ -19,6 +21,7 @@ type Alert struct {
 // Data is the top level structure that views expect data
 type Data struct {
 	Alert *Alert
+	User  *models.User
 	Yield interface{}
 }
 
