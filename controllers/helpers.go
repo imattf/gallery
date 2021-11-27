@@ -16,6 +16,7 @@ func parseForm(r *http.Request, dst interface{}) error {
 	}
 
 	dec := schema.NewDecoder()
+	dec.IgnoreUnknownKeys(true)
 	// var form SignupForm
 	if err := dec.Decode(dst, r.PostForm); err != nil {
 		return err
