@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 
@@ -15,8 +16,11 @@ import (
 
 func main() {
 
-	cfg := DefaultConfig()
-	dbCfg := DefaultPostgresConfig()
+	envPtr := flag.Bool("prod", false, "Provide this flag in prod. Ensures a .config file used for start-up")
+	flag.Parse()
+
+	cfg := LoadConfig(*envPtr)
+	dbCfg := cfg.Database
 	services, err := models.NewServices(
 		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInfo()),
 		models.WithLogMode(!cfg.IsProd()),
@@ -86,7 +90,7 @@ func main() {
 
 func must(err error) {
 	if err != nil {
-		fmt.Println("Did you start the database?")
+		fmt.Println("Database not found!!...")
 		panic(err)
 	}
 }
