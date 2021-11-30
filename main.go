@@ -69,7 +69,7 @@ func main() {
 	r.PathPrefix("/assets/").Handler(assetHandler)
 
 	// Image routes
-	imageHandler := http.FileServer(http.Dir("./images"))
+	imageHandler := http.FileServer(http.Dir("./images/"))
 	r.PathPrefix("/images/").Handler(http.StripPrefix("/images/", imageHandler))
 
 	// Gallery routes

@@ -2,13 +2,13 @@
 package views
 
 import (
-	//"fmt"
 	"bytes"
 	"errors"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"path/filepath"
 
 	"github.com/gorilla/csrf"
@@ -84,6 +84,25 @@ func addTemplateExt(files []string) {
 	}
 }
 
+// func NewView(layout string, files ...string) *View {
+// 	addTemplatePath(files)
+// 	addTemplateExt(files)
+// 	files = append(files, layoutFiles()...)
+// 	t, err := template.New("").Funcs(template.FuncMap{
+// 		"csrfField": func() (template.HTML, error) {
+// 			return "", errors.New("csrfField is not implemented")
+// 		},
+// 	}).ParseFiles(files...)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	return &View{
+// 		Template: t,
+// 		Layout:   layout,
+// 	}
+// }
+
 func NewView(layout string, files ...string) *View {
 	addTemplatePath(files)
 	addTemplateExt(files)
@@ -91,6 +110,9 @@ func NewView(layout string, files ...string) *View {
 	t, err := template.New("").Funcs(template.FuncMap{
 		"csrfField": func() (template.HTML, error) {
 			return "", errors.New("csrfField is not implemented")
+		},
+		"pathEscape": func(s string) string {
+			return url.PathEscape(s)
 		},
 	}).ParseFiles(files...)
 	if err != nil {
@@ -103,7 +125,7 @@ func NewView(layout string, files ...string) *View {
 	}
 }
 
-// listFiles returns a slaice of strings showing
+// listFiles returns a slice of strings showing
 // the layout files used in app
 func layoutFiles() []string {
 	files, err := filepath.Glob(LayoutDir + "*" + TemplateExt)

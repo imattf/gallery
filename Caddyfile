@@ -1,7 +1,7 @@
 # This is the domain we are using. Your domain will be different, or
 # it might just be a port. You can also use the server's IP address
 # and https should work with that.
-www.lenslocked.com
+gallery.faulkners.io
 
 # This enables gzip compression.
 encode gzip
