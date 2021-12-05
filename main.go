@@ -33,10 +33,10 @@ func main() {
 
 	defer services.Close()
 
-	// Reset the entire database
-	// services.DestructiveReset()
-
-	// Auto construct from the gorm
+	// Gorm services to reset datastore
+	// Destroy and Reset the entire datastore
+	services.DestructiveReset()
+	// Auto construct from the gorm data model
 	services.AutoMigrate()
 
 	// email mailgun stuff...

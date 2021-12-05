@@ -14,7 +14,7 @@ const (
 
 const welcomeText = `Hi there!
 
-Welcome to the gallery.faulkners.io! We really hope you enjoy using
+Welcome to gallery.faulkners.io! We really hope you enjoy using
 our application!
 
 Best,
@@ -23,7 +23,7 @@ Matthew
 
 const welcomeHTML = `Hi there!<br/>
 <br/>
-Welcome to the
+Welcome to
 <a href="https://gallery.faulkners.io"> gallery.faulkners.io </a>! We really hope
 you enjoy our application!<br/>
 <br/>
