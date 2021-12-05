@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"gitlab.com/go-courses/lenslocked.com/controllers"
+	"gitlab.com/go-courses/lenslocked.com/email"
 	"gitlab.com/go-courses/lenslocked.com/middleware"
 	"gitlab.com/go-courses/lenslocked.com/models"
 	"gitlab.com/go-courses/lenslocked.com/rand"
@@ -31,14 +32,27 @@ func main() {
 	must(err)
 
 	defer services.Close()
+
+	// Reset the entire database
 	// services.DestructiveReset()
+
+	// Auto construct from the gorm
 	services.AutoMigrate()
+
+	// email mailgun stuff...
+	mgCfg := cfg.Mailgun
+	emailer := email.NewClient(
+		email.WithSender("Gallery Support", "support@"+mgCfg.Domain),
+		email.WithMailgun(mgCfg.Domain, mgCfg.APIKey, mgCfg.PublicAPIKey),
+		// works w/ new version of mailgun
+		// email.WithMailgun(mgCfg.Domain, mgCfg.APIKey),
+	)
 
 	// instance a gorilla mux
 	r := mux.NewRouter()
 
 	staticC := controllers.NewStatic()
-	usersC := controllers.NewUsers(services.User)
+	usersC := controllers.NewUsers(services.User, emailer)
 	galleriesC := controllers.NewGalleries(services.Gallery, services.Image, r)
 
 	b, err := rand.Bytes(32)

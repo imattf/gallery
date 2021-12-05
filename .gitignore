@@ -24,3 +24,6 @@ images/**
 # Anything under a tmp folder
 **/tmp/*
 
+# sensitive files that should not be in repo
+.config
+
