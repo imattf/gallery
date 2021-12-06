@@ -35,6 +35,9 @@ const (
 	// ErrTitleRequired is used to insure valid title is supplied for gallery
 	ErrTitleRequired modelError = "models: title is required"
 
+	// ErrTokenInvalid is used to insure valid token is supplied for password reset
+	ErrTokenInvalid modelError = "models: token provided is not valid"
+
 	// ErrIDInvalid is returned when an ID is 0, for example
 	ErrIDInvalid privateError = "models: ID provided was invalid"
 
