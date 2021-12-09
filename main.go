@@ -123,7 +123,7 @@ func notFoundPage(w http.ResponseWriter, r *http.Request) {
 	// print my path
 	//fmt.Fprintf(w, r.URL.Path)
 
-	fmt.Fprint(w, "<h1>We could not find the page you are looking for :( </h1> <p>Please emaul us at <a href=\"mailto:matthew@faulkners.io\">support@lenslocked.com</a> if you keep getting sent to an invalid page.</p>")
+	fmt.Fprint(w, "<h1>We could not find the page you are looking for :( </h1> <p>Please emaul us at <a href=\"mailto:matthew@faulkners.io\">support@gallery.faulkners.io</a> if you keep getting sent to an invalid page.</p>")
 
 	// logging to console
 	fmt.Println("404 page")
