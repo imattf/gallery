@@ -33,7 +33,7 @@ func main() {
 
 	defer services.Close()
 
-	// Gorm services to reset datastore
+	// Gorm services to reset datastore...
 	// Destroy and Reset the entire datastore
 	services.DestructiveReset()
 	// Auto construct from the gorm data model
@@ -76,6 +76,10 @@ func main() {
 	r.Handle("/login", usersC.LoginView).Methods("GET")
 	r.HandleFunc("/login", usersC.Login).Methods("POST")
 	r.HandleFunc("/logout", requireUserMw.ApplyFn(usersC.Logout)).Methods("POST")
+	r.Handle("/forgot", usersC.ForgotPwView).Methods("GET")
+	r.HandleFunc("/forgot", usersC.InitiateReset).Methods("POST")
+	r.HandleFunc("/reset", usersC.ResetPw).Methods("GET")
+	r.HandleFunc("/reset", usersC.CompleteReset).Methods("POST")
 	// r.HandleFunc("/cookie", usersC.CookieTest).Methods("GET")
 
 	//Assets
@@ -99,7 +103,7 @@ func main() {
 	r.HandleFunc("/galleries/{id:[0-9]+}", galleriesC.Show).Methods("GET").Name(controllers.ShowGallery)
 
 	// Server startup...
-	fmt.Printf("Starting lenslocked on port :%d...\n", cfg.Port)
+	fmt.Printf("Starting galleries on port :%d...\n", cfg.Port)
 	http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), csrfMw(userMw.Apply(r)))
 }
 
@@ -119,7 +123,7 @@ func notFoundPage(w http.ResponseWriter, r *http.Request) {
 	// print my path
 	//fmt.Fprintf(w, r.URL.Path)
 
-	fmt.Fprint(w, "<h1>We could not find the page you are looking for :( </h1> <p>Please emaul us at <a href=\"mailto:support@lenslocked.com\">support@lenslocked.com</a> if you keep getting sent to an invalid page.</p>")
+	fmt.Fprint(w, "<h1>We could not find the page you are looking for :( </h1> <p>Please emaul us at <a href=\"mailto:matthew@faulkners.io\">support@lenslocked.com</a> if you keep getting sent to an invalid page.</p>")
 
 	// logging to console
 	fmt.Println("404 page")
