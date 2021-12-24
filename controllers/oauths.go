@@ -120,7 +120,7 @@ func (o *OAuths) DropboxTest(w http.ResponseWriter, r *http.Request) {
 	path := r.FormValue("path")
 
 	user := llctx.User(r.Context())
-	userOAuth, err := o.os.Find(user.ID, "dropbox")
+	userOAuth, err := o.os.Find(user.ID, service)
 	if err != nil {
 		panic(err)
 	}
