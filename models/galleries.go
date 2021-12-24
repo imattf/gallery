@@ -55,6 +55,7 @@ type galleryValidator struct {
 	GalleryDB
 }
 
+// Create a gallery in the database
 func (gv *galleryValidator) Create(gallery *Gallery) error {
 	err := runGalleryValFuncs(gallery,
 		gv.userIDRequired,
@@ -65,6 +66,7 @@ func (gv *galleryValidator) Create(gallery *Gallery) error {
 	return gv.GalleryDB.Create(gallery)
 }
 
+// Update a gallery in the database
 func (gv *galleryValidator) Update(gallery *Gallery) error {
 	err := runGalleryValFuncs(gallery,
 		gv.userIDRequired,

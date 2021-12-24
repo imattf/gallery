@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+	"golang.org/x/oauth2"
 
 	"gitlab.com/go-courses/lenslocked.com/controllers"
 	"gitlab.com/go-courses/lenslocked.com/email"
@@ -28,14 +29,16 @@ func main() {
 		models.WithUser(cfg.Pepper, cfg.HMACKey),
 		models.WithGallery(),
 		models.WithImage(),
+		models.WithOAuth(),
 	)
+
 	must(err)
 
 	defer services.Close()
 
 	// Gorm services to reset datastore...
 	// Destroy and Reset the entire datastore
-	services.DestructiveReset()
+	// services.DestructiveReset()
 	// Auto construct from the gorm data model
 	services.AutoMigrate()
 
@@ -54,6 +57,18 @@ func main() {
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUsers(services.User, emailer)
 	galleriesC := controllers.NewGalleries(services.Gallery, services.Image, r)
+
+	configs := make(map[string]*oauth2.Config)
+	configs[models.OAuthDropbox] = &oauth2.Config{
+		ClientID:     cfg.Dropbox.ID,
+		ClientSecret: cfg.Dropbox.Secret,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  cfg.Dropbox.AuthURL,
+			TokenURL: cfg.Dropbox.TokenURL,
+		},
+		RedirectURL: "http://localhost:3000/oauth/dropbox/callback",
+	}
+	oauthsC := controllers.NewOAuths(services.OAuth, configs)
 
 	b, err := rand.Bytes(32)
 	must(err)
@@ -82,7 +97,12 @@ func main() {
 	r.HandleFunc("/reset", usersC.CompleteReset).Methods("POST")
 	// r.HandleFunc("/cookie", usersC.CookieTest).Methods("GET")
 
-	//Assets
+	// OAuth routes
+	r.HandleFunc("/oauth/{service:[a-z]+}/connect", requireUserMw.ApplyFn(oauthsC.Connect))
+	r.HandleFunc("/oauth/{service:[a-z]+}/callback", requireUserMw.ApplyFn(oauthsC.Callback))
+	r.HandleFunc("/oauth/{service:[a-z]+}/test", requireUserMw.ApplyFn(oauthsC.DropboxTest))
+
+	// Asset routes
 	assetHandler := http.FileServer(http.Dir("./assets/"))
 	assetHandler = http.StripPrefix("/assets/", assetHandler)
 	r.PathPrefix("/assets/").Handler(assetHandler)

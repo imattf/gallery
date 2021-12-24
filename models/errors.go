@@ -50,6 +50,9 @@ const (
 
 	// ErrUserIDRequired is used to insure valid userID is connected to gallery
 	ErrUserIDRequired privateError = "models: userID is required"
+
+	// ErrServiceRequired is used to insure valid userID is connected to an oAuth
+	ErrServiceRequired privateError = "models: service is required"
 )
 
 type modelError string
