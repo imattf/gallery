@@ -1,15 +1,13 @@
 package controllers
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 
 	llctx "gitlab.com/go-courses/lenslocked.com/context"
+	"gitlab.com/go-courses/lenslocked.com/dbx"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
@@ -110,11 +108,11 @@ func (o *OAuths) Callback(w http.ResponseWriter, r *http.Request) {
 func (o *OAuths) DropboxTest(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	service := vars["service"]
-	oauthConfig, ok := o.configs[service]
-	if !ok {
-		http.Error(w, "Invalid OAuth2 Service", http.StatusBadRequest)
-		return
-	}
+	// oauthConfig, ok := o.configs[service]
+	// if !ok {
+	// 	http.Error(w, "Invalid OAuth2 Service", http.StatusBadRequest)
+	// 	return
+	// }
 
 	r.ParseForm()
 	path := r.FormValue("path")
@@ -126,25 +124,14 @@ func (o *OAuths) DropboxTest(w http.ResponseWriter, r *http.Request) {
 	}
 	token := userOAuth.Token
 
-	data := struct {
-		Path string `json:"path"`
-	}{
-		Path: path,
-	}
-	dataBytes, err := json.Marshal(data)
+	folders, files, err := dbx.List(token.AccessToken, path)
 	if err != nil {
 		panic(err)
 	}
-	client := oauthConfig.Client(context.TODO(), &token)
-	req, err := http.NewRequest(http.MethodPost, "https://api.dropboxapi.com/2/files/list_folder", bytes.NewReader(dataBytes))
-	if err != nil {
-		panic(err)
-	}
-	req.Header.Add("Content-Type", "application/json")
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	io.Copy(w, resp.Body)
+	fmt.Fprintln(w, "Folders=", folders)
+	fmt.Fprintln(w, "Files=", files)
 }
+
+// test with...
+// http://localhost:3000/oauth/dropbox/test
+// http://localhost:3000/oauth/dropbox/test?path=/images
