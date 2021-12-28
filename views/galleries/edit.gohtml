@@ -27,6 +27,12 @@
     {{template "uploadImageForm" .}}
   </div>
 </div>
+<div class="row">
+  <div class="col-md-10 col-md-offset-1" id="dropbox-button-container">
+    <!-- DBX Button -->
+    {{template "dropboxImageForm" .}}
+  </div>
+</div>
 <div class=row> 
   <div class="col-md-10 col-md-offset-1">
     <h3>Dangerous buttons...</h3>
@@ -36,6 +42,31 @@
     {{template "deleteGalleryForm" .}}
   </div>    
 </div>
+{{end}}
+
+{{define "javascript-footer"}}
+  <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="je797ro2r55j1d8"></script>
+  <script>
+  var dbxForm = document.getElementById("dropbox-image-form");
+  var options = {
+    success: function(files) {
+        for(i = 0; i < files.length; i++) {
+          var input = document.createElement("input");
+          input.type = "hidden";
+          input.name = "files";
+          input.value = files[i].link;
+          dbxForm.appendChild(input);
+        }
+        dbxForm.submit();
+    },
+    linkType: "direct",
+    multiselect: true,
+    extensions: ["images"],
+    folderselect: false,
+  };
+  var button = Dropbox.createChooseButton(options);
+  document.getElementById("dropbox-button-container").appendChild(button);
+  </script>
 {{end}}
 
 {{define "editGalleryForm"}}
@@ -76,6 +107,13 @@
       <button type="submit" class="btn btn-default">Upload</button>
     </div>
   </div>
+</form>
+{{end}}
+
+{{define "dropboxImageForm"}}
+<form action="/galleries/{{.ID}}/images/link" method="POST" enctype="multipart/form-data" class="form-horizontal" id="dropbox-image-form">
+  {{csrfField}}
+  <!-- Filled in with Dropbox JS -->
 </form>
 {{end}}
 
