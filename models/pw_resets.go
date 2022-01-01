@@ -1,9 +1,9 @@
 package models
 
 import (
+	"github.com/imattf/go-courses/gallery/hash"
+	"github.com/imattf/go-courses/gallery/rand"
 	"github.com/jinzhu/gorm"
-	"gitlab.com/go-courses/lenslocked.com/hash"
-	"gitlab.com/go-courses/lenslocked.com/rand"
 )
 
 type pwReset struct {

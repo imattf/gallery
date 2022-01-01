@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"gitlab.com/go-courses/lenslocked.com/context"
-	"gitlab.com/go-courses/lenslocked.com/models"
+	"github.com/imattf/go-courses/gallery/context"
+	"github.com/imattf/go-courses/gallery/models"
 )
 
 type User struct {

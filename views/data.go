@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.com/go-courses/lenslocked.com/models"
+	"github.com/imattf/go-courses/gallery/models"
 )
 
 const (

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"gitlab.com/go-courses/lenslocked.com/hash"
-	"gitlab.com/go-courses/lenslocked.com/rand"
+	"github.com/imattf/go-courses/gallery/hash"
+	"github.com/imattf/go-courses/gallery/rand"
 
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"

@@ -9,11 +9,11 @@ import (
 	"github.com/gorilla/mux"
 	"golang.org/x/oauth2"
 
-	"gitlab.com/go-courses/lenslocked.com/controllers"
-	"gitlab.com/go-courses/lenslocked.com/email"
-	"gitlab.com/go-courses/lenslocked.com/middleware"
-	"gitlab.com/go-courses/lenslocked.com/models"
-	"gitlab.com/go-courses/lenslocked.com/rand"
+	"github.com/imattf/go-courses/gallery/controllers"
+	"github.com/imattf/go-courses/gallery/email"
+	"github.com/imattf/go-courses/gallery/middleware"
+	"github.com/imattf/go-courses/gallery/models"
+	"github.com/imattf/go-courses/gallery/rand"
 )
 
 func main() {

@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 
 	"github.com/gorilla/csrf"
-	"gitlab.com/go-courses/lenslocked.com/context"
+	"github.com/imattf/go-courses/gallery/context"
 )
 
 var (

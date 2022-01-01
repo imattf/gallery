@@ -10,9 +10,9 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"gitlab.com/go-courses/lenslocked.com/context"
-	"gitlab.com/go-courses/lenslocked.com/models"
-	"gitlab.com/go-courses/lenslocked.com/views"
+	"github.com/imattf/go-courses/gallery/context"
+	"github.com/imattf/go-courses/gallery/models"
+	"github.com/imattf/go-courses/gallery/views"
 )
 
 const (

@@ -3,7 +3,7 @@ package context
 import (
 	"context"
 
-	"gitlab.com/go-courses/lenslocked.com/models"
+	"github.com/imattf/go-courses/gallery/models"
 )
 
 const (

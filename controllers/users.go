@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.com/go-courses/lenslocked.com/context"
-	"gitlab.com/go-courses/lenslocked.com/email"
-	"gitlab.com/go-courses/lenslocked.com/models"
-	"gitlab.com/go-courses/lenslocked.com/rand"
-	"gitlab.com/go-courses/lenslocked.com/views"
+	"github.com/imattf/go-courses/gallery/context"
+	"github.com/imattf/go-courses/gallery/email"
+	"github.com/imattf/go-courses/gallery/models"
+	"github.com/imattf/go-courses/gallery/rand"
+	"github.com/imattf/go-courses/gallery/views"
 	// "github.com/gorilla/schema"
 )
 
