@@ -22,7 +22,7 @@ lenslocked.com
 images/**
 
 # Anything under a tmp or stuff folder
-**/temp/*
+**/tmp/*
 
 # sensitive files that should not be in repo
 .config

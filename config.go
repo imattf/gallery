@@ -31,7 +31,7 @@ func DefaultPostgresConfig() PostgresConfig {
 		Port:     5432,
 		User:     "matthew",
 		Password: "",
-		DBname:   "lenslocked_dev",
+		DBname:   "gallery_dev",
 	}
 }
 
